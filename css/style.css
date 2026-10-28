@@ -236,13 +236,13 @@ h1 em { font-style: normal; color: #aaa69d; }
 
 .ex-scene {
   position: absolute; inset: 0; z-index: 1;
-  perspective: 1700px; perspective-origin: 42% 45%;
+  perspective: 2000px; perspective-origin: 42% 50%;
 }
 .ex-stack {
-  position: absolute; top: 56%; left: 42%;
-  height: min(50svh, 540px); aspect-ratio: 1.4;
-  margin-left: calc(min(50svh, 540px) * -.7);
-  margin-top: calc(min(50svh, 540px) * -.5);
+  position: absolute; top: 60%; left: 40%;
+  height: min(54svh, 600px); aspect-ratio: 1.4;
+  margin-left: calc(min(54svh, 600px) * -.7);
+  margin-top: calc(min(54svh, 600px) * -.5);
   transform-style: preserve-3d;
   will-change: transform;
 }
@@ -253,10 +253,15 @@ h1 em { font-style: normal; color: #aaa69d; }
   will-change: transform;
 }
 .ex-layer img { display: block; width: 100%; height: 100%; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+/* Traçado de Interlagos: vetor (SVG) posicionado no peito, sempre nítido */
+.ex-layer img.ex-track {
+  position: absolute; left: 55.7%; top: 33%; width: 25%; height: 36.5%;
+  transform: translate(-50%, -50%) rotate(55deg) scale(1, .75);
+}
 .ex-stack.isolate .ex-layer { opacity: .12; }
 .ex-stack.isolate .ex-layer.focus { opacity: 1; }
 .ex-shadow {
-  position: absolute; left: 42%; top: 76%; width: 34vw; height: 9vh; translate: -50% 0;
+  position: absolute; left: 40%; top: 84%; width: 34vw; height: 9vh; translate: -50% 0;
   background: radial-gradient(ellipse at center, rgba(0, 0, 0, .8), transparent 70%);
   opacity: .6;
 }
@@ -266,8 +271,8 @@ h1 em { font-style: normal; color: #aaa69d; }
 .ex-lines circle { fill: var(--gold-soft); }
 
 .ex-callouts {
-  position: absolute; z-index: 3; top: 50%; right: clamp(24px, 6vw, 110px); translate: 0 -50%;
-  list-style: none; margin: 0; padding: 0; width: min(300px, 26vw);
+  position: absolute; z-index: 3; top: 46%; left: min(calc(40% + min(54svh, 600px) * 1.05), calc(100% - min(270px, 22vw) - 28px)); translate: 0 -50%;
+  list-style: none; margin: 0; padding: 0; width: min(270px, 22vw);
   display: flex; flex-direction: column; gap: clamp(14px, 3.2vh, 34px);
 }
 .ex-callout {
@@ -412,17 +417,17 @@ h1 em { font-style: normal; color: #aaa69d; }
 .custom-art em { font-style: normal; color: var(--gold); }
 
 /* ---------- Como funciona ---------- */
-.how { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; padding-top: 70px; }
+.how { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 28px; padding-top: 70px; }
 .how-line { position: absolute; top: 0; left: 0; width: 100%; height: 40px; overflow: visible; }
-.how-line path { fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 1; stroke-dashoffset: 1; vector-effect: non-scaling-stroke; }
+.how-line path { fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 1; stroke-dashoffset: 1; }
 .how-step { position: relative; }
 .how-step::before {
   content: ''; position: absolute; top: -58px; left: 0; width: 14px; height: 14px; border-radius: 50%;
   background: var(--bg); border: 2px solid var(--gold); box-shadow: 0 0 0 6px rgba(173, 152, 113, .1);
 }
-.how-num { font-family: Oswald, sans-serif; font-size: 64px; line-height: 1; color: #24221e; display: block; margin-bottom: 14px; }
-.how-step h3 { font-size: 26px; }
-.how-step p { color: #8d8a83; font-size: 14px; line-height: 1.7; margin: 10px 0 0; max-width: 300px; }
+.how-num { font-family: Oswald, sans-serif; font-size: 52px; line-height: 1; color: #24221e; display: block; margin-bottom: 14px; }
+.how-step h3 { font-size: 21px; }
+.how-step p { color: #8d8a83; font-size: 13.5px; line-height: 1.65; margin: 10px 0 0; max-width: 240px; }
 
 /* ---------- Depoimentos (carrossel infinito) ---------- */
 .testimonials { padding-left: 0; padding-right: 0; overflow: hidden; }
@@ -442,10 +447,22 @@ h1 em { font-style: normal; color: #aaa69d; }
 }
 .quote blockquote { margin: 0; font-size: 16px; line-height: 1.6; color: #ddd7ca; }
 .quote figcaption { margin-top: 18px; font-size: 11px; letter-spacing: 1.2px; color: #77746d; }
-.sample-tag {
-  position: absolute; top: 14px; right: 14px; font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
-  color: #8a7a5c; border: 1px solid #3a3326; padding: 3px 6px; border-radius: 4px;
+.stars { color: #e8b84a; letter-spacing: 2px; font-size: 13px; }
+.quote .stars { display: block; margin-bottom: 14px; }
+.quote figcaption strong { color: #c9c3b6; font-weight: 700; }
+
+/* Selo de avaliações do Google */
+.g-badge {
+  display: inline-flex; align-items: center; gap: 16px; margin-top: 30px;
+  padding: 14px 20px 14px 16px; border-radius: 14px; text-decoration: none;
+  background: #0e0e0e; border: 1px solid rgba(255, 255, 255, .08);
+  transition: border-color .3s, transform .3s;
 }
+.g-badge:hover { border-color: rgba(232, 184, 74, .45); transform: translateY(-2px); }
+.g-score { font-family: Oswald, sans-serif; font-size: 40px; line-height: 1; color: #f3f0e9; }
+.g-meta { display: flex; flex-direction: column; gap: 4px; font-size: 11px; letter-spacing: 1px; color: #8d8a83; }
+.g-arrow { color: var(--gold); font-size: 18px; transition: transform .3s; }
+.g-badge:hover .g-arrow { transform: translateX(4px); }
 
 /* ---------- FAQ ---------- */
 .faq-wrap { display: grid; grid-template-columns: minmax(260px, 1fr) 1.4fr; gap: clamp(40px, 6vw, 110px); align-items: start; }
@@ -466,7 +483,17 @@ h1 em { font-style: normal; color: #aaa69d; }
 .faq-icon::after { transform: rotate(90deg); }
 .faq-item[open] .faq-icon::after { transform: rotate(0deg); }
 .faq-body { overflow: hidden; }
-.faq-body p { margin: 0; padding: 0 40px 26px 0; color: #8d8a83; font-size: 15px; line-height: 1.75; }
+.faq-body { padding: 0 40px 0 0; }
+.faq-body > :last-child { margin-bottom: 26px; }
+.faq-body p { margin: 0 0 12px; color: #8d8a83; font-size: 15px; line-height: 1.75; }
+.faq-body strong { color: #d8d1c3; font-weight: 600; }
+.size-pills { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 16px; }
+.size-pills span {
+  min-width: 40px; padding: 7px 10px; text-align: center; border-radius: 8px;
+  font-size: 12px; font-weight: 700; letter-spacing: .5px; color: var(--gold-soft);
+  border: 1px solid rgba(173, 152, 113, .35); background: rgba(173, 152, 113, .06);
+}
+.size-pills em { font-style: normal; font-size: 12px; color: #8d8a83; margin-left: 4px; }
 
 /* ---------- Chamada final: brilho girando atrás do botão ---------- */
 .cta-button { position: relative; isolation: isolate; }
@@ -585,7 +612,7 @@ h1 em { font-style: normal; color: #aaa69d; }
   .quote blockquote { font-size: 15px; }
   .faq-wrap { grid-template-columns: 1fr; gap: 10px; }
   .faq-item summary { font-size: 15px; padding: 22px 0; }
-  .faq-body p { padding-right: 10px; }
+  .faq-body { padding-right: 10px; }
   .footer { justify-content: center; text-align: center; }
 }
 

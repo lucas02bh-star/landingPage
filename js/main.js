@@ -4,7 +4,7 @@
 /* ================= CONFIGURAÇÃO ================= */
 // Número com DDI + DDD, só dígitos. Ex.: '5531999998888'
 const WHATSAPP_NUMBER = '';
-const WHATSAPP_MESSAGE = 'Olá! Vim pelo site e quero um orçamento da camiseta ADONAY.';
+const WHATSAPP_MESSAGE = 'Olá! Vim pelo site e quero fazer uma camiseta personalizada.';
 
 const FRAME_COUNT = 8;              // ângulos: 0°, 45°, 90° ... 315°
 const SCROLL_LENGTH = 2.4;          // quantas "telas" de rolagem dura o giro
@@ -271,13 +271,28 @@ function setupExploded(lenis) {
   let kickVelocity = 0;
   let active = false;
 
+  // Para onde cada camada vai quando a peça abre (em frações da altura da pilha):
+  // as camadas se espalham em leque na diagonal em vez de empilhar em profundidade,
+  // assim a foto quase não inclina e continua parecendo foto.
+  const SPREAD = [
+    { x: .5, y: .16, z: -.1, s: .9 },   // arte das costas: sai para a direita e um pouco abaixo
+    { x: 0, y: 0, z: 0, s: 1 },         // malha
+    { x: .04, y: -.3, z: .18, s: 1 },   // traçado
+    { x: .1, y: -.5, z: .32, s: 1 },    // logo
+    { x: -.1, y: -.42, z: .42, s: 1 },  // bandeira
+  ];
+
   function render() {
-    const gap = stack.offsetHeight * .24 * state.explode * (1 + kick);
+    const h = stack.offsetHeight;
+    const e = state.explode * (1 + kick);
     stack.style.transform =
-      `rotateX(${state.tilt * 56}deg) rotateZ(${state.tilt * -28}deg) scale(${1 - state.tilt * .1})`;
+      `rotateX(${state.tilt * 16}deg) rotateY(${state.tilt * -18}deg) scale(${1 - state.tilt * .06})`;
     layers.forEach((layer, i) => {
+      const v = SPREAD[i];
+      const scale = 1 + (v.s - 1) * state.explode;
       // 0.5px por camada evita "piscar" quando estão todas no mesmo plano
-      layer.style.transform = `translateZ(${(i - 2) * gap + i * .5}px)`;
+      layer.style.transform =
+        `translate3d(${v.x * h * e}px, ${v.y * h * e}px, ${v.z * h * e + i * .5}px) scale(${scale})`;
     });
 
     const showLines = getComputedStyle(svg).display !== 'none';
@@ -360,7 +375,7 @@ function setupSections() {
   // Botão "Quero essa" de cada peça abre o WhatsApp com o nome dela
   document.querySelectorAll('[data-product]').forEach((card) => {
     const link = card.querySelector('[data-whatsapp-product]');
-    const text = `Olá! Vim pelo site e quero um orçamento da camiseta ${card.dataset.product}.`;
+    const text = card.dataset.message || `Olá! Vim pelo site e quero fazer uma camiseta personalizada parecida com esta: ${card.dataset.product}.`;
     link.href = WHATSAPP_NUMBER
       ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`
       : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
