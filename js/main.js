@@ -7,7 +7,9 @@ const WHATSAPP_NUMBER = '';
 const WHATSAPP_MESSAGE = 'Olá! Vim pelo site e quero fazer uma camiseta personalizada.';
 
 const FRAME_COUNT = 8;              // ângulos: 0°, 45°, 90° ... 315°
-const SCROLL_LENGTH = 2.4;          // quantas "telas" de rolagem dura o giro
+const SCROLL_LENGTH = 1.6;          // quantas "telas" de rolagem dura o giro
+const STOPS = [0, 95, 177, 240, 360].map((deg) => deg / 360); // paradas do giro, em graus
+const STEP_DURATION = .9;           // segundos para ir de uma parada à próxima
 const EXPLODED_LENGTH = 2.2;        // quantas "telas" dura a vista explodida
 const WHEEL_SPEED = 1.3;            // sensibilidade da rodinha do mouse (1 = normal)
 const HOLD = 0.28;                  // fração de cada ângulo em que a peça fica parada
@@ -169,6 +171,12 @@ function setupAnimations() {
 
   const state = { p: 0 };
   const render = () => { draw(state.p); updateUi(state.p); };
+  let stopTarget = 0;
+  const goToStop = (p) => {
+    if (p === stopTarget) return;
+    stopTarget = p;
+    gsap.to(state, { p, duration: STEP_DURATION, ease: 'power2.inOut', overwrite: true, onUpdate: render });
+  };
 
   const tl = gsap.timeline({
     scrollTrigger: {
@@ -180,9 +188,20 @@ function setupAnimations() {
       anticipatePin: 1,
       invalidateOnRefresh: true,
       onToggle: (self) => document.body.classList.toggle('in-hero', self.isActive),
+      // O giro não acompanha a rolagem grau a grau: um toque na rodinha já leva a peça
+      // até a próxima parada (frente → manga → costas → manga → frente).
+      onUpdate: (self) => {
+        // Arredonda para a parada à frente no sentido da rolagem; a folga mínima
+        // deixa o clique nas abas (que para exatamente na parada) ficar onde caiu.
+        const eps = .0005;
+        const stop = self.direction > 0
+          ? STOPS.find((v) => v >= self.progress - eps)
+          : [...STOPS].reverse().find((v) => v <= self.progress + eps);
+        goToStop(stop ?? (self.direction > 0 ? 1 : 0));
+      },
     },
   });
-  tl.to(state, { p: 1, duration: 1, ease: 'none', onUpdate: render }, 0)
+  tl.to({}, { duration: 1 }, 0) // mantém a linha do tempo do tamanho do trecho fixado
     .to('[data-hero-copy]', { autoAlpha: 0, y: -40, duration: .08, ease: 'power1.in' }, .02)
     .to('.mobile-hint', { autoAlpha: 0, duration: .05 }, .02);
 
@@ -263,6 +282,15 @@ function setupExploded(lenis) {
     return dot;
   });
 
+  // No celular cada legenda fica logo abaixo da sua peça, como um rodapé da imagem
+  const captionPoints = layers.map((layer) => {
+    const [x, y] = layer.dataset.cap.split(',');
+    const dot = document.createElement('span');
+    dot.style.cssText = `position:absolute;left:${x}%;top:${y}%;width:1px;height:1px`;
+    layer.append(dot);
+    return dot;
+  });
+
   const lines = callouts.map(() => {
     const path = document.createElementNS(SVG_NS, 'path');
     path.setAttribute('pathLength', '1');
@@ -283,7 +311,7 @@ function setupExploded(lenis) {
   // as camadas se espalham em leque na diagonal em vez de empilhar em profundidade,
   // assim a foto quase não inclina e continua parecendo foto.
   const SPREAD = [
-    { x: .5, y: .16, z: -.1, s: .9 },   // arte das costas: sai para a direita e um pouco abaixo
+    { x: -.52, y: .08, z: -.05, s: .7 },   // arte das costas: sai para a direita e um pouco abaixo
     { x: 0, y: 0, z: 0, s: 1 },         // malha
     { x: .04, y: -.3, z: .18, s: 1 },   // traçado
     { x: .1, y: -.5, z: .32, s: 1 },    // logo
@@ -292,11 +320,11 @@ function setupExploded(lenis) {
   // No celular a tela é estreita e o título fica logo acima: leque mais curto e mais baixo
   if (window.matchMedia('(max-width: 900px)').matches) {
     SPREAD.splice(0, SPREAD.length,
-      { x: .36, y: .24, z: -.1, s: .75 },
-      { x: 0, y: 0, z: 0, s: 1 },
-      { x: .02, y: -.26, z: .08, s: 1 },
-      { x: .04, y: -.44, z: .14, s: 1 },
-      { x: -.28, y: -.3, z: .18, s: 1 });
+      { x: -.53, y: .2, z: -.05, s: .7 },  // arte das costas: embaixo, à esquerda
+      { x: 0, y: 0, z: 0, s: 1 },           // malha
+      { x: .44, y: .06, z: .05, s: 1 },     // traçado: embaixo, à direita
+      { x: .27, y: -.5, z: .05, s: 1 },    // logo: em cima, à direita
+      { x: -.3, y: -.44, z: .08, s: 1 });   // bandeira: à esquerda
   }
 
   function render() {
@@ -319,7 +347,17 @@ function setupExploded(lenis) {
       const c = state.calls[k];
       if (c > .5) visible++;
       callout.style.opacity = c;
-      callout.style.transform = `translateX(${(1 - c) * 24}px)`;
+      if (!showLines) {
+        const p = captionPoints[callout.dataset.layer].getBoundingClientRect();
+        const half = callout.offsetWidth / 2;
+        const x = clamp(p.left - box.left, half + 8, box.width - half - 8);
+        callout.style.left = x + 'px';
+        callout.style.top = (p.top - box.top + 6) + 'px';
+        callout.style.transform = `translate(-50%, ${(1 - c) * 10}px)`;
+      } else {
+        callout.style.left = callout.style.top = '';
+        callout.style.transform = `translateX(${(1 - c) * 24}px)`;
+      }
       const { path, dot } = lines[k];
       if (!showLines || c <= 0) { path.style.opacity = 0; dot.style.opacity = 0; return; }
       const a = anchors[callout.dataset.layer].getBoundingClientRect();

@@ -10,8 +10,15 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: auto; }
-body { margin: 0; background: var(--bg); color: var(--text); overflow-x: hidden; }
+/* Em monitores largos o site fica numa coluna central; as laterais são faixas de fundo
+   (por enquanto pretas, depois entra uma imagem em --side-bg) */
+:root { --page-max: 1440px; --side-bg: #000; }
+html { scroll-behavior: auto; background: var(--side-bg); }
+body {
+  margin: 0 auto; max-width: var(--page-max); position: relative;
+  background: var(--bg); color: var(--text); overflow-x: hidden;
+  box-shadow: 0 0 80px rgba(0, 0, 0, .9);
+}
 button { font: inherit; color: inherit; }
 
 /* Lenis (rolagem suave) */
@@ -283,6 +290,7 @@ h1 em { font-style: normal; color: #aaa69d; }
 .ex-callout strong { display: block; font-size: 13px; font-weight: 700; letter-spacing: .4px; color: #ece6d8; }
 .ex-callout small { display: block; margin-top: 4px; font-size: 11px; color: #85827b; line-height: 1.5; }
 .ex-callout.focus strong { color: var(--gold-soft); }
+.ex-where { display: none; }
 
 
 .cta-section {
@@ -310,7 +318,7 @@ h1 em { font-style: normal; color: #aaa69d; }
 .cta-button:hover { transform: translateY(-3px); box-shadow: 0 16px 50px rgba(37, 211, 102, .38); }
 
 .wa-float {
-  position: fixed; z-index: 50; right: 22px; bottom: 22px;
+  position: fixed; z-index: 50; right: max(22px, calc((100vw - var(--page-max)) / 2 + 22px)); bottom: 22px;
   width: 58px; height: 58px; border-radius: 50%;
   display: grid; place-items: center; background: var(--wa); color: #fff;
   box-shadow: 0 8px 30px rgba(0, 0, 0, .45);
@@ -322,6 +330,9 @@ h1 em { font-style: normal; color: #aaa69d; }
   border: 2px solid var(--wa); animation: ring 2.4s ease-out infinite;
 }
 .wa-float:hover { transform: scale(1.08); }
+/* No giro, o botão "Pedir orçamento" da barra já cumpre esse papel */
+.wa-float { transition: transform .3s, opacity .4s; }
+.in-hero .wa-float { opacity: 0; pointer-events: none; }
 @keyframes ring { from { transform: scale(1); opacity: .7 } to { transform: scale(1.6); opacity: 0 } }
 
 /* ================= SEÇÕES (base) ================= */
@@ -561,13 +572,11 @@ h1 em { font-style: normal; color: #aaa69d; }
   }
   .mobile-hint span { padding-left: 8px; color: #c2a87f; }
   .wa-float { width: 52px; height: 52px; right: 16px; bottom: 16px; transition: transform .3s, opacity .4s; }
-  /* No giro, o botão "Pedir orçamento" da barra já cumpre esse papel */
-  .in-hero .wa-float { opacity: 0; pointer-events: none; }
 
   /* Exploded view: peça no centro, legendas viram uma lista compacta embaixo */
   .ex-scene { perspective-origin: 50% 38%; }
   .ex-stack {
-    top: 55%; left: 50%; height: auto; width: min(88vw, 620px);
+    top: 52%; left: 50%; height: auto; width: min(88vw, 620px);
     margin-left: calc(min(88vw, 620px) * -.5); margin-top: calc(min(88vw, 620px) / 1.4 * -.5);
   }
   .ex-shadow { left: 50%; top: 70%; width: 70vw; }
@@ -576,12 +585,15 @@ h1 em { font-style: normal; color: #aaa69d; }
   .ex-head .eyebrow { margin-bottom: 8px; }
   .ex-head h2 { font-size: clamp(28px, 8vw, 40px); }
   .ex-counter { top: 12%; left: auto; right: 20px; }
-  .ex-callouts {
-    top: auto; bottom: 88px; left: 20px; right: 20px; translate: none; width: auto;
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px;
+  /* Legendas como rodapé de cada peça (posição calculada no main.js) */
+  .ex-callouts { inset: 0; translate: none; width: auto; display: block; pointer-events: none; }
+  .ex-callout {
+    position: absolute; display: block; width: max-content; max-width: 150px;
+    text-align: center; line-height: 1.25;
   }
-  .ex-callout small { display: none; }
+  .ex-num, .ex-callout small { display: none; }
   .ex-callout strong { font-size: 11px; }
+  .ex-where { display: block; margin-top: 2px; font-style: normal; font-size: 9px; letter-spacing: .8px; text-transform: uppercase; color: var(--gold); }
 
   /* Seções */
   .feature-grid { grid-template-columns: 1fr; gap: 14px; }
