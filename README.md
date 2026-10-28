@@ -19,8 +19,12 @@ Depois abra http://localhost:5173
 
 ## Publicação
 
-Cada push na branch `main` publica a pasta `site/` no GitHub Pages
-(`.github/workflows/pages.yml`).
+A pasta `site/` é publicada no GitHub Pages pelo ramo `gh-pages`.
+Para atualizar o link depois de mudanças:
+
+```bash
+git subtree push --prefix site origin gh-pages
+```
 
 ## Configurar o WhatsApp
 
