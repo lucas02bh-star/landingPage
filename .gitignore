@@ -1,0 +1,11 @@
+# Arquivo original compactado (o conteúdo já está em prototipo/)
+*.zip
+
+# Configurações locais do Claude
+.claude/
+
+# Sistema
+.DS_Store
+Thumbs.db
+__pycache__/
+node_modules/

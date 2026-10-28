@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#050505" />
+    <meta name="description" content="ADONAY — camisetas com estampa exclusiva. Veja a peça em 360° e peça seu orçamento pelo WhatsApp." />
+    <title>ADONAY — Camiseta 360°</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Oswald:wght@500;600&display=swap" />
+    <link rel="preload" as="image" href="img/tee/tee-00-lg.webp" media="(min-width: 741px)" />
+    <link rel="preload" as="image" href="img/tee/tee-00-sm.webp" media="(max-width: 740px)" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="in-hero">
+    <!-- ============ HERO 360° ============ -->
+    <section id="hero360" class="hero360" aria-label="Camiseta em 360 graus">
+      <div class="stage">
+        <div class="glow" aria-hidden="true"></div>
+
+        <div class="shirt-wrap" id="shirt-wrap">
+          <!-- Primeira imagem já no HTML: aparece mesmo antes do JavaScript -->
+          <img class="shirt-poster" id="shirt-poster" src="img/tee/tee-00-lg.webp"
+               srcset="img/tee/tee-00-sm.webp 760w, img/tee/tee-00-lg.webp 1400w"
+               sizes="(max-width: 740px) 100vw, 70vw"
+               alt="Camiseta preta ADONAY com estampa SENNA, vista frontal" fetchpriority="high" />
+          <canvas id="shirt-canvas" aria-hidden="true"></canvas>
+          <div class="shadow" aria-hidden="true"></div>
+        </div>
+
+        <div class="noise" aria-hidden="true"></div>
+
+        <header class="header">
+          <a class="brand" href="#hero360" data-scroll-top aria-label="ADONAY, voltar ao início">ADONAY<span class="brand-mark">✳</span></a>
+          <span class="header-center">CONCEPT / 001</span>
+          <span class="header-tag"><span class="live-dot"></span> COLEÇÃO EXCLUSIVA</span>
+        </header>
+
+        <div class="hero-copy" data-hero-copy>
+          <div class="eyebrow" data-reveal><span class="eyebrow-line"></span> DESIGN EXCLUSIVO</div>
+          <h1>
+            <span class="line"><span data-reveal>MAIS QUE</span></span>
+            <span class="line"><em data-reveal>UMA PEÇA.</em></span>
+          </h1>
+          <p data-reveal>Uma experiência em todos os ângulos.<br />Role para explorar a camiseta.</p>
+        </div>
+
+        <aside class="side-steps" aria-label="Etapas da rotação">
+          <div class="steps-title">EXPLORE A PEÇA</div>
+          <button class="step active" type="button" data-target="0"><span class="step-id">01</span><span class="step-name">FRENTE</span><span class="step-rule"></span></button>
+          <button class="step" type="button" data-target="0.25"><span class="step-id">02</span><span class="step-name">MANGA DIREITA</span><span class="step-rule"></span></button>
+          <button class="step" type="button" data-target="0.5"><span class="step-id">03</span><span class="step-name">COSTAS</span><span class="step-rule"></span></button>
+          <button class="step" type="button" data-target="0.75"><span class="step-id">04</span><span class="step-name">MANGA ESQUERDA</span><span class="step-rule"></span></button>
+        </aside>
+
+        <div class="stage-top-label">CAMISETA ESSENTIAL <span>—</span> BLACK EDITION</div>
+        <div class="stage-bottom-label"><span id="view-label">VISTA FRONTAL · SENNA</span></div>
+
+        <div class="bottom-bar">
+          <div class="scroll-hint"><span class="mouse-icon"><span></span></span><div>ROLE PARA GIRAR<br /><small>OU ARRASTE A CAMISETA</small></div></div>
+          <div class="progress-wrap">
+            <div class="progress-meta"><span>ROTAÇÃO 360°</span><span id="angle">000°</span></div>
+            <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+            <div class="progress-ticks"><span>0°</span><span>90°</span><span>180°</span><span>270°</span><span>360°</span></div>
+          </div>
+          <a class="cta-mini" data-whatsapp href="#">PEDIR ORÇAMENTO <span>→</span></a>
+        </div>
+
+        <div class="loader" id="loader" aria-live="polite">
+          <span class="loader-ring"></span>
+          <span>CARREGANDO <b id="loader-pct">0%</b></span>
+        </div>
+        <div class="mobile-hint">DESLIZE PARA GIRAR <span>↓</span></div>
+      </div>
+    </section>
+
+    <!-- ============ EXPLODED VIEW: CAMADAS DA PEÇA ============ -->
+    <section id="exploded" class="exploded" aria-label="As camadas da camiseta">
+      <div class="ex-stage">
+        <div class="glow" aria-hidden="true"></div>
+
+        <div class="ex-head">
+          <div class="eyebrow"><span class="eyebrow-line"></span> ANATOMIA DA PEÇA</div>
+          <h2>Construída em<br /><em>cinco camadas.</em></h2>
+        </div>
+
+        <div class="ex-counter" aria-hidden="true"><span id="ex-count">00</span> / 05</div>
+
+        <div class="ex-scene">
+          <div class="ex-shadow" aria-hidden="true"></div>
+          <!-- Camadas de baixo para cima. data-anchor = ponto (x%, y%) onde a linha da legenda encosta -->
+          <div class="ex-stack" id="ex-stack">
+            <div class="ex-layer" data-anchor="58,40"><img src="img/layers/layer-costas-lg.webp" srcset="img/layers/layer-costas-sm.webp 760w, img/layers/layer-costas-lg.webp 1400w" sizes="(max-width: 740px) 90vw, 50vw" alt="" fetchpriority="low" decoding="async" /></div>
+            <div class="ex-layer" data-anchor="72,78"><img src="img/layers/layer-malha-lg.webp" srcset="img/layers/layer-malha-sm.webp 760w, img/layers/layer-malha-lg.webp 1400w" sizes="(max-width: 740px) 90vw, 50vw" alt="" fetchpriority="low" decoding="async" /></div>
+            <div class="ex-layer" data-anchor="66,24"><img src="img/layers/layer-tracado-lg.webp" srcset="img/layers/layer-tracado-sm.webp 760w, img/layers/layer-tracado-lg.webp 1400w" sizes="(max-width: 740px) 90vw, 50vw" alt="" fetchpriority="low" decoding="async" /></div>
+            <div class="ex-layer" data-anchor="70,34"><img src="img/layers/layer-logo-lg.webp" srcset="img/layers/layer-logo-sm.webp 760w, img/layers/layer-logo-lg.webp 1400w" sizes="(max-width: 740px) 90vw, 50vw" alt="" fetchpriority="low" decoding="async" /></div>
+            <div class="ex-layer" data-anchor="33,30"><img src="img/layers/layer-bandeira-lg.webp" srcset="img/layers/layer-bandeira-sm.webp 760w, img/layers/layer-bandeira-lg.webp 1400w" sizes="(max-width: 740px) 90vw, 50vw" alt="" fetchpriority="low" decoding="async" /></div>
+          </div>
+        </div>
+
+        <svg class="ex-lines" id="ex-lines" aria-hidden="true"></svg>
+
+        <!-- Legendas de cima para baixo (a primeira é a camada do topo) -->
+        <ol class="ex-callouts" id="ex-callouts">
+          <li class="ex-callout" data-layer="4"><span class="ex-num">05</span><div><strong>Bandeira em chamas</strong><small>Patch na manga, cores vivas</small></div></li>
+          <li class="ex-callout" data-layer="3"><span class="ex-num">04</span><div><strong>Logo SENNA</strong><small>Branco de alta cobertura no peito</small></div></li>
+          <li class="ex-callout" data-layer="2"><span class="ex-num">03</span><div><strong>Traçado de Interlagos</strong><small>Linhas finas, detalhe sutil</small></div></li>
+          <li class="ex-callout" data-layer="1"><span class="ex-num">02</span><div><strong>Malha preta</strong><small>Toque macio, caimento leve</small></div></li>
+          <li class="ex-callout" data-layer="0"><span class="ex-num">01</span><div><strong>Arte das costas</strong><small>Pôster Ayrton Senna em tamanho grande</small></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ CHAMADA FINAL (provisória) ============ -->
+    <section class="cta-section" aria-label="Pedir orçamento">
+      <div class="cta-inner">
+        <div class="eyebrow" data-fade><span class="eyebrow-line"></span> PRÓXIMO PASSO</div>
+        <h2 data-fade>Gostou da peça?<br /><em>Fale com a gente.</em></h2>
+        <p data-fade>Orçamento rápido e sem compromisso, direto no WhatsApp.</p>
+        <a class="cta-button" data-whatsapp data-fade href="#">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+          CHAMAR NO WHATSAPP
+        </a>
+      </div>
+    </section>
+
+    <!-- Botão flutuante do WhatsApp -->
+    <a class="wa-float" data-whatsapp href="#" aria-label="Chamar no WhatsApp">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm4.5 12.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+    </a>
+
+    <!-- Bibliotecas gratuitas (scripts comuns, funcionam até abrindo o arquivo direto) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
+    <script src="js/main.js" defer></script>
+  </body>
+</html>
