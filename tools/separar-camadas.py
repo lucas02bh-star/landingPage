@@ -74,19 +74,40 @@ def main():
     flag_alpha[~(region(gray.shape, FLAG_BOX) & inside)] = 0
     flag_alpha = cv2.GaussianBlur(flag_alpha, (3, 3), 0)
 
-    # Malha lisa: apaga tudo o que foi extraído e preenche com o tecido ao redor
-    hole = ((logo_alpha > 20) | (track_alpha > 20) | (flag_alpha > 20)).astype(np.uint8)
-    hole = cv2.dilate(hole, np.ones((5, 5), np.uint8))
-    plain = cv2.inpaint(rgb, hole, 7, cv2.INPAINT_TELEA)
-    # Escurece levemente a área preenchida para não ficar manchada
-    soft = cv2.GaussianBlur(hole.astype(np.float32), (21, 21), 0)[..., None]
-    plain = (plain * (1 - .25 * soft)).astype(np.uint8)
+    # Malha lisa: tira a estampa e refaz o tecido preto com o sombreado ao redor
+    hole = ((logo_alpha > 4) | (track_alpha > 6) | (flag_alpha > 6)).astype(np.uint8)
+    hole = cv2.dilate(hole, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (25, 25)))
+    fabric = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)  # camiseta preta: sem cor, some o tom verde/amarelo
+    filled = cv2.inpaint(fabric, hole, 15, cv2.INPAINT_TELEA).astype(np.float32)
+    # Média local do tecido sem a estampa (dobras e luz), para não sobrar marca clara
+    keep = (1 - hole).astype(np.float32) * inside
+    local = cv2.GaussianBlur(fabric.astype(np.float32) * keep, (0, 0), 18) / (cv2.GaussianBlur(keep, (0, 0), 18) + 1e-3)
+    region_soft = np.clip(cv2.GaussianBlur(hole.astype(np.float32), (0, 0), 8) * 1.6, 0, 1)
+    grain = np.random.default_rng(7).normal(0, 1.6, fabric.shape).astype(np.float32)
+    patched = np.minimum(.55 * local + .45 * filled, local * 1.08) + grain
+    plain = fabric * (1 - region_soft) + patched * region_soft
+    plain = np.clip(plain, 0, 255).astype(np.uint8)
+    save("layer-malha", np.dstack([plain, plain, plain, a]))
 
-    save("layer-malha", np.dstack([plain, a]))
-    # Clareia o traçado para ele aparecer quando a camada estiver solta
-    track_rgb = np.clip(rgb.astype(np.float32) * 1.6 + 30, 0, 255).astype(np.uint8)
-    save("layer-tracado", layer(track_rgb, track_alpha))
-    save("layer-logo", layer(rgb, logo_alpha))
+    # Traçado: refeito como linha uniforme (sem serrilhado nem textura do tecido)
+    lines = (track_alpha > 70).astype(np.uint8)
+    lines = cv2.morphologyEx(lines, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
+    count, labels, stats, _ = cv2.connectedComponentsWithStats(lines)
+    for c in range(1, count):
+        if stats[c, cv2.CC_STAT_AREA] < 30:
+            lines[labels == c] = 0
+    skeleton = cv2.ximgproc.thinning(lines * 255) if hasattr(cv2, "ximgproc") else lines * 255
+    stroke = cv2.dilate(skeleton, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+    stroke = cv2.GaussianBlur(stroke.astype(np.float32), (0, 0), .7)
+    save("layer-tracado", layer(np.full_like(rgb, (210, 207, 200)), np.clip(stroke * 1.4, 0, 255)))
+
+    # Logo: cor sólida e borda nítida, como uma arte plana
+    solid = np.clip((gray - 105) / 45, 0, 1)
+    solid[~(region(gray.shape, LOGO_BOX) & inside)] = 0
+    solid = cv2.morphologyEx(solid, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8))
+    solid = cv2.GaussianBlur(solid, (0, 0), .6)
+    save("layer-logo", layer(np.full_like(rgb, (238, 235, 228)), solid * 255))
+
     save("layer-bandeira", layer(rgb, flag_alpha))
 
     # Arte das costas: centralizada no mesmo quadro, do tamanho do peito
