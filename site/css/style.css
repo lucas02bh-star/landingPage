@@ -319,6 +319,174 @@ h1 em { font-style: normal; color: #aaa69d; }
 .wa-float:hover { transform: scale(1.08); }
 @keyframes ring { from { transform: scale(1); opacity: .7 } to { transform: scale(1.6); opacity: 0 } }
 
+/* ================= SEÇÕES (base) ================= */
+.section {
+  position: relative; padding: clamp(90px, 14vh, 160px) clamp(20px, 5.4vw, 95px);
+  border-top: 1px solid rgba(255, 255, 255, .06);
+}
+.section-head { max-width: 760px; margin-bottom: clamp(44px, 7vh, 80px); }
+.section-head .eyebrow { margin-bottom: 22px; }
+.section h2, .collection h2 {
+  font-family: Oswald, 'Arial Narrow', sans-serif; font-weight: 500; margin: 0;
+  font-size: clamp(36px, 5vw, 72px); line-height: 1.03; letter-spacing: -1.2px; color: #f3f0e9;
+}
+.section h2 em, .collection h2 em { font-style: normal; color: var(--gold); }
+.section h3, .collection h3 { font-family: Oswald, sans-serif; font-weight: 500; letter-spacing: .3px; margin: 0; color: #f0ebe0; }
+
+/* Letras que surgem (o JS quebra o título em palavras) */
+[data-split] .word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .06em; }
+[data-split] .word > span { display: inline-block; will-change: transform; }
+
+/* Card com inclinação 3D + brilho que segue o mouse */
+.tilt-card {
+  --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%;
+  position: relative; overflow: hidden; isolation: isolate;
+  background: linear-gradient(160deg, #121212, #0a0a0a);
+  border: 1px solid rgba(255, 255, 255, .07); border-radius: 18px;
+  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform .5s cubic-bezier(.2, .8, .2, 1), border-color .4s;
+}
+.tilt-card.is-tilting { transition: transform .08s linear, border-color .4s; }
+.tilt-card:hover { border-color: rgba(173, 152, 113, .35); }
+.glare {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0;
+  background: radial-gradient(420px circle at var(--mx) var(--my), rgba(224, 210, 182, .14), transparent 45%);
+  transition: opacity .4s;
+}
+.tilt-card:hover .glare { opacity: 1; }
+
+/* ---------- Diferenciais ---------- */
+.feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.feature { padding: 34px 28px 38px; min-height: 250px; display: flex; flex-direction: column; }
+.feature-icon {
+  width: 42px; height: 42px; padding: 9px; margin-bottom: auto;
+  fill: none; stroke: var(--gold-soft); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+  border: 1px solid rgba(173, 152, 113, .3); border-radius: 12px; background: rgba(173, 152, 113, .06);
+}
+.feature h3 { font-size: 22px; margin-top: 40px; }
+.feature p { color: #8d8a83; font-size: 14px; line-height: 1.7; margin: 10px 0 0; }
+
+/* ---------- Coleção ---------- */
+.collection { position: relative; border-top: 1px solid rgba(255, 255, 255, .06); }
+.collection-stage {
+  height: 100vh; height: 100svh; overflow: hidden;
+  display: flex; align-items: center; gap: clamp(30px, 4vw, 70px);
+  padding-left: clamp(20px, 5.4vw, 95px);
+  background: radial-gradient(ellipse 50% 60% at 70% 50%, rgba(120, 104, 74, .1), transparent 70%), var(--bg);
+}
+/* O título fica por cima e os cards "entram por baixo" dele ao passar */
+.collection-head {
+  flex: 0 0 auto; width: calc(min(340px, 28vw) + clamp(20px, 5.4vw, 95px) + 70px);
+  position: relative; z-index: 2; align-self: stretch;
+  display: flex; flex-direction: column; justify-content: center;
+  margin-left: calc(clamp(20px, 5.4vw, 95px) * -1);
+  padding: 0 70px 0 clamp(20px, 5.4vw, 95px);
+  background: linear-gradient(90deg, var(--bg) 78%, transparent);
+}
+.collection-track { position: relative; z-index: 1; }
+.collection-head .eyebrow { margin-bottom: 22px; }
+.collection-head p { color: #77746d; font-size: 12px; letter-spacing: 1.5px; margin-top: 24px; text-transform: uppercase; }
+.collection-track { display: flex; gap: 22px; will-change: transform; padding-right: 8vw; }
+.product { flex: 0 0 clamp(260px, 25vw, 360px); display: flex; flex-direction: column; }
+.product-img {
+  aspect-ratio: 1 / 1.05; display: grid; place-items: center; overflow: hidden;
+  background: radial-gradient(circle at 50% 45%, #1d1c1a, #0b0b0b 72%);
+}
+.product-img img { width: 118%; max-width: none; height: auto; transition: transform .8s cubic-bezier(.2, .8, .2, 1); }
+.product:hover .product-img img { transform: scale(1.06); }
+.product-info { padding: 22px 24px 26px; display: flex; flex-direction: column; gap: 8px; }
+.product-tag { font-size: 9px; font-weight: 700; letter-spacing: 2.4px; color: var(--gold); }
+.product h3 { font-size: 22px; }
+.product-cta {
+  margin-top: 10px; align-self: flex-start; text-decoration: none;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #ece6d8;
+  border-bottom: 1px solid rgba(173, 152, 113, .5); padding-bottom: 4px;
+}
+.product-cta span { display: inline-block; transition: transform .3s; }
+.product-cta:hover span { transform: translateX(5px); }
+.custom-art {
+  background: linear-gradient(135deg, #1a1712, #0b0b0b 60%), #0b0b0b;
+  font-family: Oswald, sans-serif; font-size: clamp(38px, 4vw, 54px); line-height: .95;
+  color: #2e2a23; text-align: left; letter-spacing: -1px;
+}
+.custom-art em { font-style: normal; color: var(--gold); }
+
+/* ---------- Como funciona ---------- */
+.how { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; padding-top: 70px; }
+.how-line { position: absolute; top: 0; left: 0; width: 100%; height: 40px; overflow: visible; }
+.how-line path { fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 1; stroke-dashoffset: 1; vector-effect: non-scaling-stroke; }
+.how-step { position: relative; }
+.how-step::before {
+  content: ''; position: absolute; top: -58px; left: 0; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--gold); box-shadow: 0 0 0 6px rgba(173, 152, 113, .1);
+}
+.how-num { font-family: Oswald, sans-serif; font-size: 64px; line-height: 1; color: #24221e; display: block; margin-bottom: 14px; }
+.how-step h3 { font-size: 26px; }
+.how-step p { color: #8d8a83; font-size: 14px; line-height: 1.7; margin: 10px 0 0; max-width: 300px; }
+
+/* ---------- Depoimentos (carrossel infinito) ---------- */
+.testimonials { padding-left: 0; padding-right: 0; overflow: hidden; }
+.testimonials .section-head { padding: 0 clamp(20px, 5.4vw, 95px); }
+.marquee {
+  display: flex; flex-direction: column; gap: 18px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.marquee-row { display: flex; gap: 18px; width: max-content; animation: marquee 48s linear infinite; }
+.marquee-row.reverse { animation-direction: reverse; animation-duration: 56s; }
+.marquee:hover .marquee-row { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(calc(-50% - 9px)); } }
+.quote {
+  position: relative; margin: 0; width: 360px; padding: 28px 28px 24px;
+  background: #0e0e0e; border: 1px solid rgba(255, 255, 255, .07); border-radius: 16px;
+}
+.quote blockquote { margin: 0; font-size: 16px; line-height: 1.6; color: #ddd7ca; }
+.quote figcaption { margin-top: 18px; font-size: 11px; letter-spacing: 1.2px; color: #77746d; }
+.sample-tag {
+  position: absolute; top: 14px; right: 14px; font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+  color: #8a7a5c; border: 1px solid #3a3326; padding: 3px 6px; border-radius: 4px;
+}
+
+/* ---------- FAQ ---------- */
+.faq-wrap { display: grid; grid-template-columns: minmax(260px, 1fr) 1.4fr; gap: clamp(40px, 6vw, 110px); align-items: start; }
+.faq-note { color: #8d8a83; font-size: 14px; margin-top: 26px; }
+.faq-note a { color: var(--gold-soft); }
+.faq-item { border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.faq-item summary {
+  list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 20px;
+  padding: 26px 0; font-size: 17px; font-weight: 500; color: #ece6d8; transition: color .3s;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary:hover { color: var(--gold-soft); }
+.faq-icon { position: relative; flex: 0 0 18px; height: 18px; }
+.faq-icon::before, .faq-icon::after {
+  content: ''; position: absolute; top: 50%; left: 0; width: 18px; height: 1.5px; background: var(--gold);
+  transition: transform .4s cubic-bezier(.2, .8, .2, 1);
+}
+.faq-icon::after { transform: rotate(90deg); }
+.faq-item[open] .faq-icon::after { transform: rotate(0deg); }
+.faq-body { overflow: hidden; }
+.faq-body p { margin: 0; padding: 0 40px 26px 0; color: #8d8a83; font-size: 15px; line-height: 1.75; }
+
+/* ---------- Chamada final: brilho girando atrás do botão ---------- */
+.cta-button { position: relative; isolation: isolate; }
+.cta-button::before {
+  content: ''; position: absolute; inset: -2px; z-index: -1; border-radius: inherit;
+  background: conic-gradient(from var(--angle, 0deg), var(--wa), #b8f5cf, var(--wa) 40%, var(--wa));
+  animation: spin-angle 3s linear infinite; filter: blur(6px); opacity: .7;
+}
+@property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes spin-angle { to { --angle: 360deg; } }
+
+/* ---------- Rodapé ---------- */
+.footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  padding: 34px clamp(20px, 5.4vw, 95px) 40px; border-top: 1px solid rgba(255, 255, 255, .06);
+  font-size: 11px; letter-spacing: 1.2px; color: #5f5d58;
+}
+.footer .brand { font-size: 20px; }
+.footer-wa { color: var(--gold-soft); text-decoration: none; font-weight: 700; letter-spacing: 2px; }
+
 /* ================= RESPONSIVO ================= */
 @media (max-width: 1100px) {
   .hero-copy { left: 5vw; }
@@ -326,6 +494,7 @@ h1 em { font-style: normal; color: #aaa69d; }
   .step-name { font-size: 9px; }
   .bottom-bar { grid-template-columns: 1fr minmax(280px, 420px) 1fr; }
   .shirt-wrap { height: min(58svh, 600px); }
+  .feature-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 740px) {
@@ -386,6 +555,38 @@ h1 em { font-style: normal; color: #aaa69d; }
   }
   .ex-callout small { display: none; }
   .ex-callout strong { font-size: 11px; }
+
+  /* Seções */
+  .feature-grid { grid-template-columns: 1fr; gap: 14px; }
+  .feature { min-height: auto; padding: 26px 22px 28px; }
+  .feature h3 { margin-top: 24px; }
+
+  /* Coleção: no celular vira carrossel de arrastar com o dedo */
+  .collection-stage { height: auto; flex-direction: column; align-items: stretch; gap: 30px; padding: 90px 0 70px; }
+  .collection-head { flex: none; width: auto; margin: 0; padding: 0 20px; background: none; }
+  .collection-track {
+    overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 20px 14px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .collection-track::-webkit-scrollbar { display: none; }
+  .product { flex-basis: 78vw; scroll-snap-align: center; }
+
+  /* Como funciona: linha vertical à esquerda */
+  .how { grid-template-columns: 1fr; gap: 44px; padding: 0 0 0 36px; }
+  .how-line { display: none; }
+  .how::before {
+    content: ''; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 1.5px;
+    background: var(--gold); transform-origin: top; transform: scaleY(var(--how-progress, 0));
+  }
+  .how-step::before { top: 2px; left: -36px; }
+  .how-num { font-size: 48px; }
+
+  .quote { width: 280px; padding: 24px 22px 20px; }
+  .quote blockquote { font-size: 15px; }
+  .faq-wrap { grid-template-columns: 1fr; gap: 10px; }
+  .faq-item summary { font-size: 15px; padding: 22px 0; }
+  .faq-body p { padding-right: 10px; }
+  .footer { justify-content: center; text-align: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {

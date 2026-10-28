@@ -7,7 +7,9 @@ const WHATSAPP_NUMBER = '';
 const WHATSAPP_MESSAGE = 'Olá! Vim pelo site e quero um orçamento da camiseta ADONAY.';
 
 const FRAME_COUNT = 8;              // ângulos: 0°, 45°, 90° ... 315°
-const SCROLL_LENGTH = 4.5;          // quantas "telas" de rolagem dura o giro
+const SCROLL_LENGTH = 2.4;          // quantas "telas" de rolagem dura o giro
+const EXPLODED_LENGTH = 2.2;        // quantas "telas" dura a vista explodida
+const WHEEL_SPEED = 1.3;            // sensibilidade da rodinha do mouse (1 = normal)
 const HOLD = 0.28;                  // fração de cada ângulo em que a peça fica parada
 
 const CAPTIONS = [
@@ -151,7 +153,7 @@ function setupAnimations() {
 
   let lenis = null;
   if (window.Lenis && !reducedMotion) {
-    lenis = new Lenis({ lerp: .09, smoothWheel: true });
+    lenis = new Lenis({ lerp: .1, smoothWheel: true, wheelMultiplier: WHEEL_SPEED, touchMultiplier: 1.4 });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
@@ -185,10 +187,10 @@ function setupAnimations() {
   };
 
   steps.forEach((step) => step.addEventListener('click', () => scrollToProgress(Number(step.dataset.target))));
-  document.querySelector('[data-scroll-top]').addEventListener('click', (e) => {
+  document.querySelectorAll('[data-scroll-top]').forEach((link) => link.addEventListener('click', (e) => {
     e.preventDefault();
     scrollToProgress(0);
-  });
+  }));
 
   // Arrastar a camiseta com o mouse também gira
   let dragging = false;
@@ -210,6 +212,7 @@ function setupAnimations() {
   wrap.addEventListener('pointercancel', stopDrag);
 
   setupExploded(lenis);
+  setupSections();
 
   // Entrada dos textos
   if (!reducedMotion) {
@@ -219,11 +222,12 @@ function setupAnimations() {
     // Anima o canvas (não o wrap) para não mexer na centralização via CSS
     gsap.from(canvas, { scale: .94, duration: 1.4, ease: 'power3.out' });
 
-    gsap.utils.toArray('[data-fade]').forEach((el, i) => {
-      gsap.from(el, {
-        y: 40, opacity: 0, duration: 1, ease: 'power3.out', delay: i * .08,
-        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none reverse' },
-      });
+    // Elementos que entram juntos na tela aparecem em sequência
+    gsap.set('[data-fade]', { y: 40, opacity: 0 });
+    ScrollTrigger.batch('[data-fade]', {
+      start: 'top 88%',
+      onEnter: (batch) => gsap.to(batch, { y: 0, opacity: 1, duration: 1, ease: 'power3.out', stagger: .1, overwrite: true }),
+      onLeaveBack: (batch) => gsap.to(batch, { y: 40, opacity: 0, duration: .4, overwrite: true }),
     });
   }
 
@@ -306,7 +310,7 @@ function setupExploded(lenis) {
     scrollTrigger: {
       trigger: '#exploded',
       start: 'top top',
-      end: () => '+=' + window.innerHeight * 3.5,
+      end: () => '+=' + window.innerHeight * EXPLODED_LENGTH,
       pin: true,
       scrub: .6,
       anticipatePin: 1,
@@ -347,6 +351,140 @@ function setupExploded(lenis) {
 
   window.addEventListener('resize', render);
   render();
+}
+
+/* ================= SEÇÕES ================= */
+function setupSections() {
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  // Botão "Quero essa" de cada peça abre o WhatsApp com o nome dela
+  document.querySelectorAll('[data-product]').forEach((card) => {
+    const link = card.querySelector('[data-whatsapp-product]');
+    const text = `Olá! Vim pelo site e quero um orçamento da camiseta ${card.dataset.product}.`;
+    link.href = WHATSAPP_NUMBER
+      ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`
+      : `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    link.target = '_blank';
+    link.rel = 'noopener';
+  });
+
+  // Títulos: cada palavra sobe de dentro de uma "máscara"
+  document.querySelectorAll('[data-split]').forEach((title) => {
+    const walk = (node) => {
+      [...node.childNodes].forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const frag = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach((part) => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) { frag.append(part); return; }
+            const word = document.createElement('span');
+            word.className = 'word';
+            word.innerHTML = `<span>${part}</span>`;
+            frag.append(word);
+          });
+          child.replaceWith(frag);
+        } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== 'BR') {
+          walk(child);
+        }
+      });
+    };
+    walk(title);
+    if (reducedMotion) return;
+    gsap.from(title.querySelectorAll('.word > span'), {
+      yPercent: 115, duration: 1, ease: 'power4.out', stagger: .05,
+      scrollTrigger: { trigger: title, start: 'top 85%', toggleActions: 'play none none reverse' },
+    });
+  });
+
+  // Cards: inclinação 3D e brilho seguindo o mouse (só com mouse)
+  if (finePointer && !reducedMotion) {
+    document.querySelectorAll('.tilt-card').forEach((card) => {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        card.classList.add('is-tilting');
+        card.style.setProperty('--ry', `${(x - .5) * 10}deg`);
+        card.style.setProperty('--rx', `${(.5 - y) * 10}deg`);
+        card.style.setProperty('--mx', `${x * 100}%`);
+        card.style.setProperty('--my', `${y * 100}%`);
+      });
+      card.addEventListener('pointerleave', () => {
+        card.classList.remove('is-tilting');
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+      });
+    });
+  }
+
+  const mm = gsap.matchMedia();
+
+  // Coleção: no desktop a seção trava e os cards andam para o lado com a rolagem
+  mm.add('(min-width: 741px)', () => {
+    const track = document.getElementById('collection-track');
+    const distance = () => Math.max(0, track.scrollWidth - (window.innerWidth - track.getBoundingClientRect().left));
+    gsap.to(track, {
+      x: () => -distance(),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#colecao',
+        start: 'top top',
+        end: () => '+=' + distance(),
+        pin: true,
+        scrub: .6,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+      },
+    });
+  });
+
+  // Como funciona: a linha se desenha e os passos aparecem
+  const how = document.getElementById('how');
+  mm.add('(min-width: 741px)', () => {
+    gsap.to('.how-line path', {
+      strokeDashoffset: 0, ease: 'none',
+      scrollTrigger: { trigger: how, start: 'top 80%', end: 'top 35%', scrub: .5 },
+    });
+  });
+  mm.add('(max-width: 740px)', () => {
+    gsap.to(how, {
+      '--how-progress': 1, ease: 'none',
+      scrollTrigger: { trigger: how, start: 'top 75%', end: 'bottom 60%', scrub: .5 },
+    });
+  });
+  if (!reducedMotion) {
+    gsap.from('.how-step', {
+      y: 40, opacity: 0, duration: .9, ease: 'power3.out', stagger: .18,
+      scrollTrigger: { trigger: how, start: 'top 75%', toggleActions: 'play none none reverse' },
+    });
+  }
+
+  // FAQ: abre e fecha com animação de altura
+  document.querySelectorAll('.faq-item').forEach((item) => {
+    const summary = item.querySelector('summary');
+    const body = item.querySelector('.faq-body');
+    summary.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (item.open) {
+        gsap.to(body, { height: 0, duration: .4, ease: 'power2.inOut', onComplete: () => { item.open = false; gsap.set(body, { clearProps: 'height' }); } });
+      } else {
+        item.open = true;
+        gsap.from(body, { height: 0, duration: .5, ease: 'power3.out', clearProps: 'height' });
+      }
+    });
+  });
+
+  // Depoimentos: duplica cada linha para o carrossel girar sem emenda
+  document.querySelectorAll('.marquee-row').forEach((row) => {
+    [...row.children].forEach((item) => {
+      const copy = item.cloneNode(true);
+      copy.setAttribute('aria-hidden', 'true');
+      row.append(copy);
+    });
+  });
+
+  // Imagens carregando depois mudam alturas: recalcula as posições
+  window.addEventListener('load', () => ScrollTrigger.refresh());
 }
 
 /* ================= INÍCIO ================= */
