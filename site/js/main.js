@@ -58,13 +58,21 @@ function loadFrames() {
   const jobs = frames.map((_, i) => new Promise((resolve) => {
     const img = new Image();
     img.decoding = 'async';
-    img.src = `img/tee/tee-${String(i).padStart(2, '0')}-${size}.webp`;
-    const finish = () => {
+    let settled = false;
+    const finish = (ok) => {
+      if (settled) return;
+      settled = true;
+      if (ok) frames[i] = img;
       done++;
       loaderPct.textContent = Math.round((done / FRAME_COUNT) * 100) + '%';
       resolve();
     };
-    img.decode().then(() => { frames[i] = img; }).catch(() => {}).finally(finish);
+    // onload em vez de img.decode(): em alguns celulares (Safari) o decode() nunca responde
+    // e o carregamento ficava parado. O limite de tempo garante que a página sempre segue.
+    img.onload = () => { if (img.naturalWidth > 0) frames[i] = img; finish(img.naturalWidth > 0); };
+    img.onerror = () => finish(false);
+    setTimeout(() => finish(img.complete && img.naturalWidth > 0), 8000);
+    img.src = `img/tee/tee-${String(i).padStart(2, '0')}-${size}.webp`;
   }));
   return Promise.all(jobs);
 }
@@ -281,6 +289,15 @@ function setupExploded(lenis) {
     { x: .1, y: -.5, z: .32, s: 1 },    // logo
     { x: -.1, y: -.42, z: .42, s: 1 },  // bandeira
   ];
+  // No celular a tela é estreita e o título fica logo acima: leque mais curto e mais baixo
+  if (window.matchMedia('(max-width: 900px)').matches) {
+    SPREAD.splice(0, SPREAD.length,
+      { x: .36, y: .24, z: -.1, s: .75 },
+      { x: 0, y: 0, z: 0, s: 1 },
+      { x: .02, y: -.26, z: .08, s: 1 },
+      { x: .04, y: -.44, z: .14, s: 1 },
+      { x: -.28, y: -.3, z: .18, s: 1 });
+  }
 
   function render() {
     const h = stack.offsetHeight;
@@ -435,7 +452,7 @@ function setupSections() {
   const mm = gsap.matchMedia();
 
   // Coleção: no desktop a seção trava e os cards andam para o lado com a rolagem
-  mm.add('(min-width: 741px)', () => {
+  mm.add('(min-width: 901px)', () => {
     const track = document.getElementById('collection-track');
     const distance = () => Math.max(0, track.scrollWidth - (window.innerWidth - track.getBoundingClientRect().left));
     gsap.to(track, {
@@ -455,13 +472,13 @@ function setupSections() {
 
   // Como funciona: a linha se desenha e os passos aparecem
   const how = document.getElementById('how');
-  mm.add('(min-width: 741px)', () => {
+  mm.add('(min-width: 901px)', () => {
     gsap.to('.how-line path', {
       strokeDashoffset: 0, ease: 'none',
       scrollTrigger: { trigger: how, start: 'top 80%', end: 'top 35%', scrub: .5 },
     });
   });
-  mm.add('(max-width: 740px)', () => {
+  mm.add('(max-width: 900px)', () => {
     gsap.to(how, {
       '--how-progress': 1, ease: 'none',
       scrollTrigger: { trigger: how, start: 'top 75%', end: 'bottom 60%', scrub: .5 },

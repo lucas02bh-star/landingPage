@@ -524,7 +524,7 @@ h1 em { font-style: normal; color: #aaa69d; }
   .feature-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 740px) {
+@media (max-width: 900px) {
   .header { height: 70px; padding: 16px 20px; }
   .brand { font-size: 23px; }
   .header-center { display: none; }
@@ -567,17 +567,17 @@ h1 em { font-style: normal; color: #aaa69d; }
   /* Exploded view: peça no centro, legendas viram uma lista compacta embaixo */
   .ex-scene { perspective-origin: 50% 38%; }
   .ex-stack {
-    top: 40%; left: 50%; height: auto; width: 88vw;
-    margin-left: -44vw; margin-top: calc(88vw / 1.4 * -.5);
+    top: 55%; left: 50%; height: auto; width: min(88vw, 620px);
+    margin-left: calc(min(88vw, 620px) * -.5); margin-top: calc(min(88vw, 620px) / 1.4 * -.5);
   }
-  .ex-shadow { left: 50%; top: 55%; width: 70vw; }
+  .ex-shadow { left: 50%; top: 70%; width: 70vw; }
   .ex-lines { display: none; }
   .ex-head { top: 12%; bottom: auto; left: 20px; }
   .ex-head .eyebrow { margin-bottom: 8px; }
   .ex-head h2 { font-size: clamp(28px, 8vw, 40px); }
   .ex-counter { top: 12%; left: auto; right: 20px; }
   .ex-callouts {
-    top: auto; bottom: 64px; left: 20px; right: 20px; translate: none; width: auto;
+    top: auto; bottom: 88px; left: 20px; right: 20px; translate: none; width: auto;
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px;
   }
   .ex-callout small { display: none; }
@@ -596,7 +596,7 @@ h1 em { font-style: normal; color: #aaa69d; }
     scrollbar-width: none; -webkit-overflow-scrolling: touch;
   }
   .collection-track::-webkit-scrollbar { display: none; }
-  .product { flex-basis: 78vw; scroll-snap-align: center; }
+  .product { flex-basis: min(78vw, 360px); scroll-snap-align: center; }
 
   /* Como funciona: linha vertical à esquerda */
   .how { grid-template-columns: 1fr; gap: 44px; padding: 0 0 0 36px; }
