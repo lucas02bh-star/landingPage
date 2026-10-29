@@ -12,13 +12,14 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Oswald:wght@500;600&display=swap" />
     <link rel="preload" as="image" href="img/tee/tee-00-lg.webp" media="(min-width: 741px)" />
     <link rel="preload" as="image" href="img/tee/tee-00-sm.webp" media="(max-width: 740px)" />
-    <link rel="stylesheet" href="css/style.css?v=22" />
+    <link rel="stylesheet" href="css/style.css?v=26" />
   </head>
   <body class="in-hero">
     <!-- ============ HERO 360° ============ -->
     <section id="hero360" class="hero360" aria-label="Camiseta em 360 graus">
       <div class="stage">
         <div class="glow" aria-hidden="true"></div>
+        <div class="cursor-light" id="cursor-light" aria-hidden="true"></div>
 
         <div class="shirt-wrap" id="shirt-wrap">
           <!-- Primeira imagem já no HTML: aparece mesmo antes do JavaScript -->
@@ -70,6 +71,91 @@
       </div>
     </section>
 
+    <!-- ============ PARA QUEM FAZEMOS (cards de segmento) ============ -->
+    <section id="segmentos" class="section segments" aria-labelledby="segments-title">
+      <div class="section-head">
+        <div class="eyebrow" data-fade><span class="eyebrow-line"></span> PARA QUEM FAZEMOS</div>
+        <h2 id="segments-title" data-split>A camisa do seu grupo,<br /><em>do seu jeito.</em></h2>
+      </div>
+      <ul class="seg-offer" data-fade aria-label="Condições">
+        <li><b>10</b> peças de pedido mínimo</li>
+        <li>Arte e <b>mockup</b> para você aprovar</li>
+        <li>Do <b>PP ao G5</b> e infantil</li>
+        <li><b>Pix</b> ou cartão</li>
+      </ul>
+      <div class="seg-grid">
+          <article class="tilt-card seg-card" data-fade data-product="IGREJA" data-message="Olá! Vim pelo site e quero orçamento de camisas para a minha igreja. Quantidade aproximada: __. Data do evento: __.">
+            <span class="glare" aria-hidden="true"></span>
+            <div class="seg-img">
+              <!-- Mockup gerado no ChatGPT (original em referencias-imagens/gpt) -->
+              <img class="seg-img-a" src="img/segmentos/igreja-a.webp" alt="Baby look verde musgo com estampa dourada Ministério de Louvor" width="640" height="800" loading="lazy" decoding="async" />
+              <img class="seg-img-b" src="img/segmentos/igreja-b.webp" alt="" aria-hidden="true" width="640" height="800" loading="lazy" decoding="async" />
+              <span class="seg-num">01</span>
+              <span class="seg-word" aria-hidden="true">IGREJA</span>
+            </div>
+            <div class="seg-info">
+              <span class="seg-tag">IGREJA</span>
+              <h3>Igrejas e ministérios</h3>
+              <p>Congressos, retiros, células e eventos com a identidade do seu ministério.</p>
+              <span class="seg-proof">A partir de 10 peças</span>
+              <a class="seg-cta" data-whatsapp-product href="#">ORÇAR PARA MINHA IGREJA <span>→</span></a>
+            </div>
+          </article>
+          <article class="tilt-card seg-card" data-fade data-product="EMPRESA" data-message="Olá! Vim pelo site e quero orçamento de uniformes para a minha empresa. Quantidade aproximada: __.">
+            <span class="glare" aria-hidden="true"></span>
+            <div class="seg-img">
+              <!-- Mockup gerado no ChatGPT (original em referencias-imagens/gpt) -->
+              <img class="seg-img-a" src="img/segmentos/empresa-a.webp" alt="Camisa social azul royal com ADONAY bordado no peito" width="640" height="800" loading="lazy" decoding="async" />
+              <img class="seg-img-b" src="img/segmentos/empresa-b.webp" alt="" aria-hidden="true" width="640" height="800" loading="lazy" decoding="async" />
+              <span class="seg-num">02</span>
+              <span class="seg-word" aria-hidden="true">EMPRESA</span>
+            </div>
+            <div class="seg-info">
+              <span class="seg-tag">EMPRESA</span>
+              <h3>Uniformes de empresa</h3>
+              <p>Camisa social, polo ou camiseta com a sua marca bordada no peito.</p>
+              <span class="seg-proof">Bordado com a sua marca</span>
+              <a class="seg-cta" data-whatsapp-product href="#">ORÇAR UNIFORMES <span>→</span></a>
+            </div>
+          </article>
+          <article class="tilt-card seg-card" data-fade data-product="TERCEIRÃO" data-message="Olá! Vim pelo site e quero orçamento de camisas de terceirão/formatura. Número de alunos: __. Escola: __.">
+            <span class="glare" aria-hidden="true"></span>
+            <div class="seg-img">
+              <!-- Mockup gerado no ChatGPT (original em referencias-imagens/gpt) -->
+              <img class="seg-img-a" src="img/segmentos/terceirao-a.webp" alt="Camiseta vinho de terceirão com TERCEIRÃO em creme e reflexo no peito" width="640" height="800" loading="lazy" decoding="async" />
+              <img class="seg-img-b" src="img/segmentos/terceirao-b.webp" alt="" aria-hidden="true" width="640" height="800" loading="lazy" decoding="async" />
+              <span class="seg-num">03</span>
+              <span class="seg-word" aria-hidden="true">TERCEIRÃO</span>
+            </div>
+            <div class="seg-info">
+              <span class="seg-tag">TERCEIRÃO</span>
+              <h3>Terceirão e formatura</h3>
+              <p>Um ano que merece ficar marcado. Arte exclusiva da turma, aprovada por vocês.</p>
+              <span class="seg-proof">Mockup para aprovar</span>
+              <a class="seg-cta" data-whatsapp-product href="#">ORÇAR PARA MINHA TURMA <span>→</span></a>
+            </div>
+          </article>
+          <article class="tilt-card seg-card" data-fade data-product="INTERCLASSE" data-message="Olá! Vim pelo site e quero orçamento de camisas de interclasse. Quantidade aproximada: __. Data dos jogos: __.">
+            <span class="glare" aria-hidden="true"></span>
+            <div class="seg-img">
+              <!-- Mockup gerado no ChatGPT (original em referencias-imagens/gpt) -->
+              <img class="seg-img-a" src="img/segmentos/interclasse-a.webp" alt="Camisa dry fit de interclasse com mascote lobo na frente e mangas pretas" width="640" height="800" loading="lazy" decoding="async" />
+              <img class="seg-img-b" src="img/segmentos/interclasse-b.webp" alt="" aria-hidden="true" width="640" height="800" loading="lazy" decoding="async" />
+              <span class="seg-num">04</span>
+              <span class="seg-word" aria-hidden="true">INTERCLASSE</span>
+            </div>
+            <div class="seg-info">
+              <span class="seg-tag">INTERCLASSE</span>
+              <h3>Interclasse e jogos</h3>
+              <p>As cores da sua sala em campo. A gente cria a arte com vocês.</p>
+              <span class="seg-proof">Pix ou cartão</span>
+              <a class="seg-cta" data-whatsapp-product href="#">ORÇAR PARA O INTERCLASSE <span>→</span></a>
+            </div>
+          </article>
+      </div>
+      <p class="seg-other" data-fade>Outro grupo? Família, time, evento ou festa: <a data-whatsapp href="#">chame no WhatsApp →</a></p>
+    </section>
+
     <!-- ============ EXPLODED VIEW: CAMADAS DA PEÇA ============ -->
     <section id="exploded" class="exploded" aria-label="As camadas da camiseta">
       <div class="ex-stage">
@@ -77,7 +163,7 @@
 
         <div class="ex-head">
           <div class="eyebrow"><span class="eyebrow-line"></span> ANATOMIA DA PEÇA</div>
-          <h2>Construída em<br /><em>cinco camadas.</em></h2>
+          <h2 data-split>Construída em<br /><em>cinco camadas.</em></h2>
         </div>
 
         <div class="ex-counter" aria-hidden="true"><span id="ex-count">00</span> / 05</div>
@@ -146,7 +232,7 @@
       <div class="collection-stage">
         <div class="collection-head">
           <div class="eyebrow"><span class="eyebrow-line"></span> EXEMPLO DE TRABALHO</div>
-          <h2 id="collection-title">Cada ângulo<br /><em>conta uma história.</em></h2>
+          <h2 id="collection-title" data-split>Cada ângulo<br /><em>conta uma história.</em></h2>
           <p>Estampa criada sob encomenda. A sua pode ser assim.</p>
         </div>
         <div class="collection-track" id="collection-track">
@@ -186,7 +272,7 @@
         <h2 id="steps-title" data-split>Da sua ideia à sua casa<br /><em>em cinco passos.</em></h2>
       </div>
       <div class="how" id="how">
-        <svg class="how-line" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 20 H1000" pathLength="1" /></svg>
+        <svg class="how-line" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><path class="how-base" d="M0 20 H1000" pathLength="1" /><path class="how-draw" d="M0 20 H1000" pathLength="1" /></svg>
         <div class="how-step">
           <span class="how-num">01</span>
           <h3>Conte sua ideia</h3>
@@ -319,6 +405,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
     <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js" defer></script>
-    <script src="js/main.js?v=22" defer></script>
+    <script src="js/main.js?v=26" defer></script>
   </body>
 </html>

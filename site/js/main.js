@@ -216,6 +216,22 @@ function setupAnimations() {
 
   window.__lenis = lenis; // facilita testes pelo console
 
+  // Luz suave que acompanha o mouse atrás da camiseta (só com mouse)
+  const stageEl = document.querySelector('.hero360 .stage');
+  const light = document.getElementById('cursor-light');
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches && !reducedMotion) {
+    const lightX = gsap.quickTo(light, 'x', { duration: .9, ease: 'power3.out' });
+    const lightY = gsap.quickTo(light, 'y', { duration: .9, ease: 'power3.out' });
+    gsap.set(light, { x: stageEl.clientWidth * .53, y: stageEl.clientHeight * .49 });
+    stageEl.addEventListener('pointermove', (e) => {
+      const r = stageEl.getBoundingClientRect();
+      lightX(e.clientX - r.left);
+      lightY(e.clientY - r.top);
+      stageEl.classList.add('lit');
+    });
+    stageEl.addEventListener('pointerleave', () => stageEl.classList.remove('lit'));
+  }
+
   // Clique nas abas leva direto ao ângulo e o giro continua dali
   steps.forEach((step, i) => step.addEventListener('click', () => {
     goToStop(i);
@@ -454,7 +470,7 @@ function setupSections() {
     walk(title);
     if (reducedMotion) return;
     gsap.from(title.querySelectorAll('.word > span'), {
-      yPercent: 115, duration: 1, ease: 'power4.out', stagger: .05,
+      yPercent: 115, rotation: 7, transformOrigin: '0% 100%', duration: 1.1, ease: 'power4.out', stagger: .06,
       scrollTrigger: { trigger: title, start: 'top 85%', toggleActions: 'play none none reverse' },
     });
   });
@@ -474,26 +490,35 @@ function setupSections() {
       });
       card.addEventListener('pointerleave', () => {
         card.classList.remove('is-tilting');
-        card.style.setProperty('--rx', '0deg');
-        card.style.setProperty('--ry', '0deg');
+        // Volta para a inclinação padrão do CSS (os cards do carrossel ficam levemente virados)
+        card.style.removeProperty('--rx');
+        card.style.removeProperty('--ry');
       });
     });
   }
 
   const mm = gsap.matchMedia();
 
-  // Como funciona: a linha se desenha e os passos aparecem
+  // Como funciona: a linha se desenha e cada etapa acende quando a linha chega nela
   const how = document.getElementById('how');
+  const howSteps = [...how.querySelectorAll('.how-step')];
+  const lightSteps = (progress, vertical) => {
+    const size = vertical ? how.offsetHeight : how.offsetWidth;
+    howSteps.forEach((step) => {
+      const at = (vertical ? step.offsetTop : step.offsetLeft) / size;
+      step.classList.toggle('lit', progress >= at - .01);
+    });
+  };
   mm.add('(min-width: 901px)', () => {
-    gsap.to('.how-line path', {
+    gsap.to('.how-line .how-draw', {
       strokeDashoffset: 0, ease: 'none',
-      scrollTrigger: { trigger: how, start: 'top 80%', end: 'top 35%', scrub: .5 },
+      scrollTrigger: { trigger: how, start: 'top 80%', end: 'top 35%', scrub: .5, onUpdate: (self) => lightSteps(self.progress, false) },
     });
   });
   mm.add('(max-width: 900px)', () => {
     gsap.to(how, {
       '--how-progress': 1, ease: 'none',
-      scrollTrigger: { trigger: how, start: 'top 75%', end: 'bottom 60%', scrub: .5 },
+      scrollTrigger: { trigger: how, start: 'top 75%', end: 'bottom 60%', scrub: .5, onUpdate: (self) => lightSteps(self.progress, true) },
     });
   });
   if (!reducedMotion) {
@@ -518,6 +543,19 @@ function setupSections() {
     });
   });
 
+  // Depoimentos com cara de avaliação do Google: inicial do cliente, "G" no canto e
+  // estrelas separadas uma a uma (para acenderem em sequência)
+  const G_ICON = '<svg class="q-g" viewBox="0 0 24 24" aria-hidden="true"><path fill="#e8e5dc" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3Z"/><path fill="#c9c3b6" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z"/><path fill="#8d8a83" d="M6.4 14a6 6 0 0 1 0-3.9V7.5H3.1a10 10 0 0 0 0 9.1L6.4 14Z"/><path fill="#ad9871" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.5l3.3 2.6C7.2 7.8 9.4 6 12 6Z"/></svg>';
+  document.querySelectorAll('.quote').forEach((quote) => {
+    const name = quote.querySelector('figcaption strong');
+    const initial = name.textContent.trim().charAt(0).toUpperCase();
+    name.insertAdjacentHTML('beforebegin', `<span class="q-avatar" aria-hidden="true">${initial}</span>`);
+    quote.insertAdjacentHTML('afterbegin', G_ICON);
+  });
+  document.querySelectorAll('.testimonials .stars').forEach((stars) => {
+    stars.innerHTML = [...stars.textContent.trim()].map((s) => `<span class="star">${s}</span>`).join('');
+  });
+
   // Depoimentos: duplica cada linha para o carrossel girar sem emenda
   document.querySelectorAll('.marquee-row').forEach((row) => {
     [...row.children].forEach((item) => {
@@ -526,6 +564,18 @@ function setupSections() {
       row.append(copy);
     });
   });
+
+  if (!reducedMotion) {
+    // Estrelas acendem uma a uma quando as avaliações aparecem
+    const starTargets = document.querySelectorAll('.testimonials .star');
+    gsap.set(starTargets, { opacity: .15, scale: .5 });
+    ScrollTrigger.create({
+      trigger: '.testimonials', start: 'top 75%',
+      onEnter: () => document.querySelectorAll('.testimonials .stars').forEach((stars) => {
+        gsap.to(stars.children, { opacity: 1, scale: 1, duration: .45, ease: 'back.out(3)', stagger: .09, delay: .2 });
+      }),
+    });
+  }
 
   // Imagens carregando depois mudam alturas: recalcula as posições
   window.addEventListener('load', () => ScrollTrigger.refresh());

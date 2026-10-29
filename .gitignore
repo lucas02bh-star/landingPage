@@ -9,3 +9,7 @@
 Thumbs.db
 __pycache__/
 node_modules/
+
+# Ficam só no computador (backup local e fotos de referência/terceiros)
+Page versao 1/
+referencias-imagens/
