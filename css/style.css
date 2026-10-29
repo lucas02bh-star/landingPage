@@ -129,6 +129,9 @@ h1 .line { display: block; overflow: hidden; padding-bottom: .04em; }
 h1 .line > * { display: inline-block; }
 h1 em { font-style: normal; color: #aaa69d; }
 .hero-copy p { font-size: 13px; line-height: 2; color: #8d8c85; margin-top: 26px; }
+/* No computador o botão fica junto do texto; a barra de baixo é só do celular */
+.hero-cta-line { overflow: hidden; margin-top: 28px; padding: 2px 0; }
+.hero-cta { display: inline-block; pointer-events: auto; }
 
 .side-steps {
   position: absolute; z-index: 4; top: 30%; right: clamp(24px, 4.8vw, 85px);
@@ -157,15 +160,19 @@ h1 em { font-style: normal; color: #aaa69d; }
 }
 .stage-top-label { top: 12%; }
 .stage-top-label span { padding: 0 8px; color: #514e47; }
-.stage-bottom-label { bottom: 18.5%; color: #c5bbab; font-weight: 700; letter-spacing: 3px; overflow: hidden; }
+.stage-bottom-label { bottom: 7%; color: #c5bbab; font-weight: 700; letter-spacing: 3px; overflow: hidden; }
 #view-label { display: inline-block; }
 
+/* Barra fixa de baixo: só no celular */
+.bottom-bar { display: none; }
+@media (max-width: 900px) {
 .bottom-bar {
-  position: absolute; z-index: 5; bottom: 0; left: 0; right: 0; height: 140px;
-  padding: 25px clamp(24px, 4.2vw, 76px) 28px;
-  display: grid; grid-template-columns: 1fr minmax(330px, 460px) 1fr; align-items: center;
+  position: absolute; z-index: 5; bottom: 0; left: 0; right: 0; height: 100px;
+  padding: 20px clamp(24px, 4.2vw, 76px);
+  display: flex; justify-content: flex-end; align-items: center;
   border-top: 1px solid rgba(255, 255, 255, .09);
   background: linear-gradient(0deg, rgba(5, 5, 5, .95), rgba(5, 5, 5, .6));
+}
 }
 .scroll-hint { display: flex; align-items: center; gap: 17px; font-size: 10px; font-weight: 700; letter-spacing: 1.6px; line-height: 1.8; color: #e0dad0; }
 .scroll-hint small { font-size: 9px; font-weight: 400; letter-spacing: 1.3px; color: #777770; }
@@ -236,7 +243,7 @@ h1 em { font-style: normal; color: #aaa69d; }
 }
 .ex-head h2 em { font-style: normal; color: var(--gold); }
 .ex-counter {
-  position: absolute; z-index: 4; top: 9%; left: clamp(24px, 5.4vw, 95px);
+  position: absolute; z-index: 4; bottom: 9%; right: clamp(24px, 5.4vw, 95px);
   font-size: 10px; font-weight: 700; letter-spacing: 2.4px; color: #6f6c66;
 }
 .ex-counter span { font-family: Oswald, sans-serif; font-size: 22px; color: #ece6d8; letter-spacing: 1px; margin-right: 4px; }
@@ -246,7 +253,7 @@ h1 em { font-style: normal; color: #aaa69d; }
   perspective: 2000px; perspective-origin: 42% 50%;
 }
 .ex-stack {
-  position: absolute; top: 60%; left: 40%;
+  position: absolute; top: 47%; left: 40%;
   height: min(54svh, 600px); aspect-ratio: 1.4;
   margin-left: calc(min(54svh, 600px) * -.7);
   margin-top: calc(min(54svh, 600px) * -.5);
@@ -268,7 +275,7 @@ h1 em { font-style: normal; color: #aaa69d; }
 .ex-stack.isolate .ex-layer { opacity: .12; }
 .ex-stack.isolate .ex-layer.focus { opacity: 1; }
 .ex-shadow {
-  position: absolute; left: 40%; top: 84%; width: 34vw; height: 9vh; translate: -50% 0;
+  position: absolute; left: 40%; top: 71%; width: 34vw; height: 9vh; translate: -50% 0;
   background: radial-gradient(ellipse at center, rgba(0, 0, 0, .8), transparent 70%);
   opacity: .6;
 }
@@ -294,8 +301,8 @@ h1 em { font-style: normal; color: #aaa69d; }
 
 
 .cta-section {
-  position: relative; min-height: 90vh; display: grid; place-items: center;
-  padding: 120px 24px; text-align: center;
+  position: relative; display: grid; place-items: center;
+  padding: clamp(56px, 9vh, 96px) 24px; text-align: center;
   background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(120, 104, 74, .16), transparent 70%), var(--bg);
   border-top: 1px solid rgba(255, 255, 255, .06);
 }
@@ -337,10 +344,10 @@ h1 em { font-style: normal; color: #aaa69d; }
 
 /* ================= SEÇÕES (base) ================= */
 .section {
-  position: relative; padding: clamp(90px, 14vh, 160px) clamp(20px, 5.4vw, 95px);
+  position: relative; padding: clamp(40px, 6vh, 72px) clamp(20px, 5.4vw, 95px);
   border-top: 1px solid rgba(255, 255, 255, .06);
 }
-.section-head { max-width: 760px; margin-bottom: clamp(44px, 7vh, 80px); }
+.section-head { max-width: 760px; margin-bottom: clamp(32px, 5vh, 56px); }
 .section-head .eyebrow { margin-bottom: 22px; }
 .section h2, .collection h2 {
   font-family: Oswald, 'Arial Narrow', sans-serif; font-weight: 500; margin: 0;
@@ -385,7 +392,7 @@ h1 em { font-style: normal; color: #aaa69d; }
 /* ---------- Coleção ---------- */
 .collection { position: relative; border-top: 1px solid rgba(255, 255, 255, .06); }
 .collection-stage {
-  height: 100vh; height: 100svh; overflow: hidden;
+  overflow: hidden; padding-top: clamp(40px, 6vh, 72px); padding-bottom: clamp(40px, 6vh, 72px);
   display: flex; align-items: center; gap: clamp(30px, 4vw, 70px);
   padding-left: clamp(20px, 5.4vw, 95px);
   background: radial-gradient(ellipse 50% 60% at 70% 50%, rgba(120, 104, 74, .1), transparent 70%), var(--bg);
@@ -402,7 +409,9 @@ h1 em { font-style: normal; color: #aaa69d; }
 .collection-track { position: relative; z-index: 1; }
 .collection-head .eyebrow { margin-bottom: 22px; }
 .collection-head p { color: #77746d; font-size: 12px; letter-spacing: 1.5px; margin-top: 24px; text-transform: uppercase; }
-.collection-track { display: flex; gap: 22px; will-change: transform; padding-right: 8vw; }
+.collection-track { display: flex; gap: 22px; width: max-content; padding-right: 22px; animation: collection-loop 60s linear infinite; }
+/* Carrossel automático: anda sozinho (sem parar no mouse), a rolagem continua rolando a página */
+@keyframes collection-loop { to { transform: translateX(-50%); } }
 .product { flex: 0 0 clamp(260px, 25vw, 360px); display: flex; flex-direction: column; }
 .product-img {
   aspect-ratio: 1 / 1.05; display: grid; place-items: center; overflow: hidden;
@@ -530,7 +539,6 @@ h1 em { font-style: normal; color: #aaa69d; }
   .hero-copy { left: 5vw; }
   .side-steps { right: 4vw; width: 155px; }
   .step-name { font-size: 9px; }
-  .bottom-bar { grid-template-columns: 1fr minmax(280px, 420px) 1fr; }
   .shirt-wrap { height: min(58svh, 600px); }
   .feature-grid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -545,11 +553,13 @@ h1 em { font-style: normal; color: #aaa69d; }
   .eyebrow { font-size: 8px; letter-spacing: 1.7px; margin-bottom: 10px; }
   h1 { font-size: clamp(36px, 10.5vw, 60px); letter-spacing: -1px; }
   .hero-copy p { font-size: 11px; line-height: 1.5; margin-top: 8px; }
+  .hero-cta-line { display: none; }
+  .bottom-bar { display: flex; }
 
   .shirt-wrap { top: 55%; left: 50%; height: auto; width: 100vw; max-height: 52svh; }
 
   .side-steps {
-    top: auto; bottom: 150px; left: 16px; right: 16px; width: auto;
+    top: auto; bottom: 100px; left: 16px; right: 16px; width: auto;
     flex-direction: row; justify-content: space-between; gap: 5px;
   }
   .steps-title, .step-id, .step-rule { display: none; }
@@ -558,19 +568,10 @@ h1 em { font-style: normal; color: #aaa69d; }
   .step.active { border-bottom: 1px solid #ba9f70; }
 
   .stage-top-label { display: none; }
-  .stage-bottom-label { bottom: 200px; font-size: 9px; }
+  .stage-bottom-label { bottom: 145px; font-size: 9px; }
 
-  .bottom-bar { height: 130px; padding: 16px 20px 20px; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
-  .progress-wrap { width: 100%; }
-  .scroll-hint { display: none; }
-  .cta-mini { justify-self: auto; align-self: stretch; text-align: center; padding: 12px; }
-  .progress-ticks { display: none; }
-
-  .mobile-hint {
-    position: absolute; z-index: 4; bottom: 225px; left: 0; right: 0; display: block;
-    text-align: center; color: #8e877c; font-size: 9px; letter-spacing: 2px;
-  }
-  .mobile-hint span { padding-left: 8px; color: #c2a87f; }
+  .bottom-bar { height: 84px; padding: 14px 20px 18px; flex-direction: column; justify-content: center; }
+  .cta-mini { align-self: stretch; text-align: center; padding: 12px; }
   .wa-float { width: 52px; height: 52px; right: 16px; bottom: 16px; transition: transform .3s, opacity .4s; }
 
   /* Exploded view: peça no centro, legendas viram uma lista compacta embaixo */
@@ -584,7 +585,7 @@ h1 em { font-style: normal; color: #aaa69d; }
   .ex-head { top: 12%; bottom: auto; left: 20px; }
   .ex-head .eyebrow { margin-bottom: 8px; }
   .ex-head h2 { font-size: clamp(28px, 8vw, 40px); }
-  .ex-counter { top: 12%; left: auto; right: 20px; }
+  .ex-counter { top: 12%; bottom: auto; left: auto; right: 20px; }
   /* Legendas como rodapé de cada peça (posição calculada no main.js) */
   .ex-callouts { inset: 0; translate: none; width: auto; display: block; pointer-events: none; }
   .ex-callout {
@@ -601,14 +602,10 @@ h1 em { font-style: normal; color: #aaa69d; }
   .feature h3 { margin-top: 24px; }
 
   /* Coleção: no celular vira carrossel de arrastar com o dedo */
-  .collection-stage { height: auto; flex-direction: column; align-items: stretch; gap: 30px; padding: 90px 0 70px; }
+  .collection-stage { flex-direction: column; align-items: stretch; gap: 30px; padding: 56px 0 50px; }
   .collection-head { flex: none; width: auto; margin: 0; padding: 0 20px; background: none; }
-  .collection-track {
-    overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 20px 14px;
-    scrollbar-width: none; -webkit-overflow-scrolling: touch;
-  }
-  .collection-track::-webkit-scrollbar { display: none; }
-  .product { flex-basis: min(78vw, 360px); scroll-snap-align: center; }
+  .collection-track { gap: 14px; padding-right: 14px; animation-duration: 45s; }
+  .product { flex-basis: min(70vw, 320px); }
 
   /* Como funciona: linha vertical à esquerda */
   .how { grid-template-columns: 1fr; gap: 44px; padding: 0 0 0 36px; }

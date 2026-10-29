@@ -7,10 +7,11 @@ const WHATSAPP_NUMBER = '';
 const WHATSAPP_MESSAGE = 'Olá! Vim pelo site e quero fazer uma camiseta personalizada.';
 
 const FRAME_COUNT = 8;              // ângulos: 0°, 45°, 90° ... 315°
-const SCROLL_LENGTH = 1.6;          // quantas "telas" de rolagem dura o giro
 const STOPS = [0, 95, 177, 240, 360].map((deg) => deg / 360); // paradas do giro, em graus
-const STEP_DURATION = .9;           // segundos para ir de uma parada à próxima
-const EXPLODED_LENGTH = 2.2;        // quantas "telas" dura a vista explodida
+const STEP_DURATION = 1.1;          // segundos para ir de uma parada à próxima
+const STOP_PAUSE = 2.2;             // segundos que a peça fica parada em cada ângulo
+const EXPLODED_LENGTH = .3;         // quantas "telas" a seção das camadas fica parada na tela
+const EXPLODED_SECONDS = 1.2;       // duração da animação das camadas abrindo        // quantas "telas" dura a vista explodida
 const WHEEL_SPEED = 1.3;            // sensibilidade da rodinha do mouse (1 = normal)
 const HOLD = 0.28;                  // fração de cada ângulo em que a peça fica parada
 
@@ -37,9 +38,7 @@ const canvas = document.getElementById('shirt-canvas');
 const ctx = canvas.getContext('2d');
 const loader = document.getElementById('loader');
 const loaderPct = document.getElementById('loader-pct');
-const angleLabel = document.getElementById('angle');
 const viewLabel = document.getElementById('view-label');
-const progressFill = document.getElementById('progress-fill');
 const steps = [...document.querySelectorAll('.step')];
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -136,10 +135,12 @@ function draw(progress) {
 let currentStep = -1;
 
 function updateUi(progress) {
-  angleLabel.textContent = String(Math.round(progress * 360)).padStart(3, '0') + '°';
-  progressFill.style.transform = `scaleX(${progress})`;
-
-  const selected = Math.round(progress * 4) % 4;
+  // Aba mais próxima do ângulo atual (as paradas 0° e 360° são a frente)
+  let selected = 0;
+  STOPS.slice(0, 4).forEach((stop, i) => {
+    if (Math.abs(progress - stop) < Math.abs(progress - STOPS[selected])) selected = i;
+  });
+  if (progress > (STOPS[3] + 1) / 2) selected = 0;
   if (selected === currentStep) return;
   currentStep = selected;
   steps.forEach((step, i) => {
@@ -171,72 +172,60 @@ function setupAnimations() {
 
   const state = { p: 0 };
   const render = () => { draw(state.p); updateUi(state.p); };
-  let stopTarget = 0;
-  const goToStop = (p) => {
-    if (p === stopTarget) return;
-    stopTarget = p;
-    gsap.to(state, { p, duration: STEP_DURATION, ease: 'power2.inOut', overwrite: true, onUpdate: render });
+
+  // Giro automático: a camiseta passa sozinha por frente → manga → costas → manga → frente,
+  // parando um pouco em cada ângulo. A rolagem do mouse só rola a página.
+  let stopIndex = 0;
+  let timer = null;
+  let playing = false;
+  const goToStop = (index) => {
+    if (stopIndex === STOPS.length - 1) {
+      state.p = 0; // 360° é a mesma imagem de 0°: volta sem ninguém perceber
+      stopIndex = 0;
+    }
+    stopIndex = index;
+    gsap.to(state, { p: STOPS[index], duration: STEP_DURATION, ease: 'power2.inOut', overwrite: true, onUpdate: render });
+  };
+  const schedule = () => {
+    clearTimeout(timer);
+    if (!playing || reducedMotion) return;
+    timer = setTimeout(() => {
+      goToStop(stopIndex === STOPS.length - 1 ? 1 : stopIndex + 1);
+      schedule();
+    }, (STEP_DURATION + STOP_PAUSE) * 1000);
+  };
+  const setPlaying = (on) => {
+    playing = on && !document.hidden;
+    schedule();
   };
 
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '#hero360',
-      start: 'top top',
-      end: () => '+=' + window.innerHeight * SCROLL_LENGTH,
-      pin: true,
-      scrub: .6,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-      onToggle: (self) => document.body.classList.toggle('in-hero', self.isActive),
-      // O giro não acompanha a rolagem grau a grau: um toque na rodinha já leva a peça
-      // até a próxima parada (frente → manga → costas → manga → frente).
-      onUpdate: (self) => {
-        // Arredonda para a parada à frente no sentido da rolagem; a folga mínima
-        // deixa o clique nas abas (que para exatamente na parada) ficar onde caiu.
-        const eps = .0005;
-        const stop = self.direction > 0
-          ? STOPS.find((v) => v >= self.progress - eps)
-          : [...STOPS].reverse().find((v) => v <= self.progress + eps);
-        goToStop(stop ?? (self.direction > 0 ? 1 : 0));
-      },
-    },
+  // Só gira enquanto a primeira dobra está na tela (e a aba do navegador visível)
+  const heroTrigger = ScrollTrigger.create({
+    trigger: '#hero360',
+    start: 'top bottom', // já ativo com a página no topo (scroll 0)
+    end: 'bottom 60%',
+    onToggle: (self) => document.body.classList.toggle('in-hero', self.isActive),
   });
-  tl.to({}, { duration: 1 }, 0) // mantém a linha do tempo do tamanho do trecho fixado
-    .to('[data-hero-copy]', { autoAlpha: 0, y: -40, duration: .08, ease: 'power1.in' }, .02)
-    .to('.mobile-hint', { autoAlpha: 0, duration: .05 }, .02);
+  ScrollTrigger.create({
+    trigger: '#hero360',
+    start: 'top bottom',
+    end: 'bottom top',
+    onToggle: (self) => setPlaying(self.isActive),
+  });
+  document.addEventListener('visibilitychange', () => setPlaying(heroTrigger.isActive || window.scrollY < window.innerHeight));
 
-  const trigger = tl.scrollTrigger;
   window.__lenis = lenis; // facilita testes pelo console
-  const scrollToProgress = (p, immediate = false) => {
-    const y = trigger.start + clamp(p) * (trigger.end - trigger.start);
-    if (lenis) lenis.scrollTo(y, { immediate, duration: 1.4 });
-    else window.scrollTo({ top: y, behavior: immediate ? 'instant' : 'smooth' });
-  };
 
-  steps.forEach((step) => step.addEventListener('click', () => scrollToProgress(Number(step.dataset.target))));
+  // Clique nas abas leva direto ao ângulo e o giro continua dali
+  steps.forEach((step, i) => step.addEventListener('click', () => {
+    goToStop(i);
+    schedule();
+  }));
   document.querySelectorAll('[data-scroll-top]').forEach((link) => link.addEventListener('click', (e) => {
     e.preventDefault();
-    scrollToProgress(0);
+    if (lenis) lenis.scrollTo(0, { duration: 1.4 });
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
   }));
-
-  // Arrastar a camiseta com o mouse também gira
-  let dragging = false;
-  let startX = 0;
-  let startP = 0;
-  wrap.addEventListener('pointerdown', (e) => {
-    if (e.pointerType === 'touch') return;
-    dragging = true;
-    startX = e.clientX;
-    startP = trigger.progress;
-    wrap.setPointerCapture(e.pointerId);
-  });
-  wrap.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    scrollToProgress(startP + (e.clientX - startX) / Math.max(320, wrap.clientWidth) * .9, true);
-  });
-  const stopDrag = () => { dragging = false; };
-  wrap.addEventListener('pointerup', stopDrag);
-  wrap.addEventListener('pointercancel', stopDrag);
 
   setupExploded(lenis);
   setupSections();
@@ -303,9 +292,6 @@ function setupExploded(lenis) {
 
   // calls é um objeto (não array): o GSAP trataria um array como lista de alvos
   const state = { tilt: 0, explode: 0, calls: Object.fromEntries(callouts.map((_, k) => [k, 0])) };
-  let kick = 0;
-  let kickVelocity = 0;
-  let active = false;
 
   // Para onde cada camada vai quando a peça abre (em frações da altura da pilha):
   // as camadas se espalham em leque na diagonal em vez de empilhar em profundidade,
@@ -329,7 +315,7 @@ function setupExploded(lenis) {
 
   function render() {
     const h = stack.offsetHeight;
-    const e = state.explode * (1 + kick);
+    const e = state.explode;
     stack.style.transform =
       `rotateX(${state.tilt * 16}deg) rotateY(${state.tilt * -18}deg) scale(${1 - state.tilt * .06})`;
     layers.forEach((layer, i) => {
@@ -374,35 +360,32 @@ function setupExploded(lenis) {
     counter.textContent = String(visible).padStart(2, '0');
   }
 
-  const tl = gsap.timeline({
-    defaults: { ease: 'none' },
-    onUpdate: render,
-    scrollTrigger: {
-      trigger: '#exploded',
-      start: 'top top',
-      end: () => '+=' + window.innerHeight * EXPLODED_LENGTH,
-      pin: true,
-      scrub: .6,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-      onToggle: (self) => { active = self.isActive; },
-    },
-  });
+  // As camadas abrem sozinhas: basta um toque na rodinha ao chegar na seção e a animação
+  // inteira (separar + legendas) roda até o fim. Rolando para cima, ela fecha.
+  const tl = gsap.timeline({ paused: true, defaults: { ease: 'none' }, onUpdate: render });
   tl.to(state, { tilt: 1, duration: .4, ease: 'power2.inOut' }, 0)
     .to(state, { explode: 1, duration: .42, ease: 'power3.inOut' }, .08);
   callouts.forEach((_, k) => {
     tl.to(state.calls, { [k]: 1, duration: .1, ease: 'power2.out' }, .4 + k * .07);
   });
-  tl.to({}, { duration: .15 }); // segura a vista explodida antes de soltar
+  tl.timeScale(tl.duration() / EXPLODED_SECONDS);
+  window.__explodedTl = tl; // facilita testes pelo console
 
-  // "Mola": rolar rápido abre um pouco mais as camadas e elas voltam balançando
-  gsap.ticker.add(() => {
-    if (!active) return;
-    const target = lenis && !reducedMotion ? clamp(lenis.velocity / 40, -1, 1) * .18 : 0;
-    kickVelocity = (kickVelocity + (target - kick) * .12) * .78;
-    kick += kickVelocity;
-    if (Math.abs(kickVelocity) > .0005 || Math.abs(target - kick) > .0005) render();
+  ScrollTrigger.create({
+    trigger: '#exploded',
+    start: 'top top',
+    end: () => '+=' + window.innerHeight * EXPLODED_LENGTH,
+    pin: true,
+    invalidateOnRefresh: true,
+    // Abre no primeiro toque e só fecha ao subir de volta para fora da seção:
+    // pequenos recuos da rolagem suave não fazem a animação ir e voltar
+    onEnter: () => tl.play(),
+    onLeave: () => tl.play(),
+    onLeaveBack: () => tl.reverse(),
   });
+  // Quem já chega abaixo da seção (ex.: recarregou a página) vê as camadas abertas
+  if (window.scrollY > document.getElementById('exploded').offsetTop) tl.progress(1);
+
 
   // Passar o mouse na legenda destaca só aquela camada
   callouts.forEach((callout) => {
@@ -426,6 +409,16 @@ function setupExploded(lenis) {
 /* ================= SEÇÕES ================= */
 function setupSections() {
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  // Exemplos de trabalho: duplica os cards para o carrossel automático girar sem emenda
+  // (feito antes de ligar os botões, assim as cópias também abrem o WhatsApp)
+  const collectionTrack = document.getElementById('collection-track');
+  [...collectionTrack.children].forEach((item) => {
+    const copy = item.cloneNode(true);
+    copy.setAttribute('aria-hidden', 'true');
+    copy.querySelectorAll('a').forEach((a) => a.setAttribute('tabindex', '-1'));
+    collectionTrack.append(copy);
+  });
 
   // Botão "Quero essa" de cada peça abre o WhatsApp com o nome dela
   document.querySelectorAll('[data-product]').forEach((card) => {
@@ -488,25 +481,6 @@ function setupSections() {
   }
 
   const mm = gsap.matchMedia();
-
-  // Coleção: no desktop a seção trava e os cards andam para o lado com a rolagem
-  mm.add('(min-width: 901px)', () => {
-    const track = document.getElementById('collection-track');
-    const distance = () => Math.max(0, track.scrollWidth - (window.innerWidth - track.getBoundingClientRect().left));
-    gsap.to(track, {
-      x: () => -distance(),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '#colecao',
-        start: 'top top',
-        end: () => '+=' + distance(),
-        pin: true,
-        scrub: .6,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      },
-    });
-  });
 
   // Como funciona: a linha se desenha e os passos aparecem
   const how = document.getElementById('how');
